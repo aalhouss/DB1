@@ -1,0 +1,17 @@
+-->mittels EXPLAIN ANALYZE bekommen wir für die Anfragen die folgenden Ausführungszeiten;
+1/Execution time=0.070ms
+2/Execution time=0.130ms
+3/Execution time=0.244ms
+4/Execution time=0.048ms
+5/Execution time=0.048ms
+6/Execution time=0.212ms
+7/Execution time=0.111ms
+8/Execution time=0.031ms
+9/Execution time =0.066ms
+10/Execution time=0.071ms
+--> Beschleunigung der Ausführung der 3.Anfrage :
+
+create index mein_index 
+on university.studenten(matrnr,name)
+
+-->mittels EXPLAIN ANALYZE bekommen wir jetzt für die Anfrage die  Ausführungszeit ( 0.162 ms) .

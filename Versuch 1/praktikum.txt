@@ -1,0 +1,120 @@
+######## Teil 1 ########
+SELECT MatrNr 
+FROM university.hoeren , university.vorlesungen 
+WHERE hoeren.VorlNr=vorlesungen.VorlNr AND vorlesungen.titel='Ethik';
+erg:
+28106 
+29120 
+21233
+23333
+########## Teil 2 ##########
+SELECT distinct name
+FROM university.hoeren h1 join university.studenten s1  on h1.matrnr = s1.matrnr
+WHERE name != 'Schopenhauer' AND VorlNr in (
+	SELECT VorlNr
+    FROM university.studenten s1 join university.hoeren h1 on s1.matrnr = h1.matrnr
+	WHERE name = 'Schopenhauer');
+erg:
+Ahmad 
+Fatima
+Feuerbach 
+Fichte
+Theophrastos
+Yassin
+####################Teil 3##################
+SELECT name, h1.matrnr
+FROM university.hoeren h1 join university.studenten s1  on h1.matrnr = s1.matrnr
+WHERE name != 'Schopenhauer' AND VorlNr in (
+	SELECT VorlNr
+    FROM university.studenten s1 join university.hoeren h1 on s1.matrnr = h1.matrnr
+	WHERE name = 'Schopenhauer')
+GROUP BY name, h1.matrnr
+HAVING COUNT (Name) = (SELECT COUNT(vorlnr)
+FROM university.studenten s1 join university.hoeren h1 on s1.matrnr = h1.matrnr
+WHERE name = 'Schopenhauer');
+erg:
+name		matrnr
+Fatima		23333
+Yassin		21222
+
+################ Teil 4 ###################
+SELECT nachfolger
+FROM university.voraussetzen
+GROUP BY nachfolger
+HAVING count(nachfolger) >= 2;
+erg:
+5052 
+################ Teil 5#################
+SELECT  distinct VorlNr ,count(VorlNr) as Anzahl
+FROM university.pruefen
+group by VorlNr
+ORDER BY VorlNr ASC;	 
+erg: 
+vorlnr 		anzahl
+4630		2
+5001		2	
+5041		1
+################ Teil 6 ###########
+CREATE VIEW v1 AS
+SELECT CAST(assistenten.Boss AS int) AS boss
+FROM university.assistenten
+
+create view v2 as 
+select p.Name AS name ,count (a.PersNr) AS anzahl
+from v1, university.assistenten a , university.professoren p  
+where  v1.boss=p.persNr 
+group by p.Name
+
+select v2.name
+from v2
+where v2.anzahl=(
+select  max(v2.anzahl)
+from university.professoren p ,v2 )
+erg:
+Hichem
+Sokrates
+Kopernikus
+################ Teil 7###################
+SELECT s.matrnr
+from university.Studenten as s join university.hoeren as h on s.matrnr=h.matrnr
+group by s.matrnr
+having count (s.matrnr)=(Select count (v.vorlnr)
+from university.vorlesungen v );	
+erg: 
+23333
+##################### Teil 8 ##################
+SELECT   AVG(Note)
+FROM university.pruefen
+WHERE   pruefen.Note='1' OR pruefen.Note='2'  ;
+erg:
+1.6000000
+####################### Teil 9 #######################
+SELECT name , matrnr, avg(note) AS grade 
+FROM university.studenten NATURAL JOIN university.pruefen 
+GROUP BY name,Matrnr;
+erg: 
+name 			matnr 			grade
+Carnap			28106			1.000000
+Schopenhauer		27550			2.000000
+Ahmad			21233			1.500000
+Jonas			25403			2.000000
+
+######################Teil 11###########################
+SELECT v.vorlnr,vo.vorgaenger,vo.nachfolger 
+FROM university.vorlesungen v, university.voraussetzen vo
+WHERE v.vorlnr=vo.vorgaenger or v.vorlnr=vo.nachfolger
+GROUP BY  v.vorlnr ,vo.nachfolger ,vorgaenger
+Erg: 
+vorlnr			vorgaenger		nachfolger
+5052			5043			5259	
+5041			5041			5216
+5049			5001			5049
+5001			5001			5043
+5043			5043			5052
+5041			5001			5041
+5001			5001			5041
+5043			5001			5043	
+5259			5052			5059
+5041			5041			5052	
+5216			5041			5216
+5052			5041			5052				
